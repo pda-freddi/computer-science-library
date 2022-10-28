@@ -96,6 +96,7 @@ public class BookController {
 	 * Save a new book object
 	 * @param book to be saved
 	 * @return newly created book object
+	 * @throws InvalidInputObjectException if input book object is missing fields
 	 */
 	@PostMapping()
 	public Book saveNewBook(@RequestBody Book book) {

@@ -96,6 +96,7 @@ public class ArticleController {
      * Save a new article object
      * @param article to be saved
      * @return newly created article object
+     * @throws InvalidInputObjectException if input article object is missing fields
      */
     @PostMapping()
     public Article saveNewArticle(@RequestBody Article article) {

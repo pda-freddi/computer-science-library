@@ -69,6 +69,14 @@ public class Video {
 	    this.channel = channel;
 	}
 	
+	public Category getCategory() {
+	    return category;
+	}
+	
+	public void setCategory(Category category) {
+	    this.category = category;
+	}
+	
 	public Integer getLength() {
 	    return length;
 	}

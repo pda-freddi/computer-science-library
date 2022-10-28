@@ -2,6 +2,7 @@ package com.pdafr.computer.science.library.controller;
 
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pdafr.computer.science.library.exceptions.EntityNotFoundException;
@@ -99,9 +101,10 @@ public class ArticleController {
      * @throws InvalidInputObjectException if input article object is missing fields
      */
     @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public Article saveNewArticle(@RequestBody Article article) {
         if (article.getTitle() == null || article.getAuthor() == null || article.getCategory() == null || article.getReadTime() == null || article.getLink() == null) {
-            throw new InvalidInputObjectException("Invalid input article object");
+            throw new InvalidInputObjectException("Input article object missing field(s)");
         }
         Article newArticle = this.articleRepository.save(article);
         return newArticle;

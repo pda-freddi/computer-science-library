@@ -2,6 +2,7 @@ package com.pdafr.computer.science.library.controller;
 
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pdafr.computer.science.library.exceptions.EntityNotFoundException;
@@ -99,9 +101,10 @@ public class BookController {
 	 * @throws InvalidInputObjectException if input book object is missing fields
 	 */
 	@PostMapping()
+	@ResponseStatus(HttpStatus.CREATED)
 	public Book saveNewBook(@RequestBody Book book) {
 	    if (book.getTitle() == null || book.getAuthor() == null || book.getCategory() == null || book.getNumPages() == null) {
-	        throw new InvalidInputObjectException("Invalid input book object");
+	        throw new InvalidInputObjectException("Input book object missing field(s)");
 	    }
 		Book newBook = this.bookRepository.save(book);
 		return newBook;

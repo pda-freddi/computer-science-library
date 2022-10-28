@@ -38,7 +38,7 @@ public class VideoController {
      * @throws InvalidQueryParameterException
      */
     @GetMapping()
-    public Iterable<Video> getAllVideos(@RequestParam(name="sortby", required=false) String sortBy, @RequestParam(required=false) Boolean asc) {
+    public Iterable<Video> getAllVideos(@RequestParam(name="sort_by", required=false) String sortBy, @RequestParam(required=false) Boolean asc) {
         // Initialize asc variable to a default value if it's not specified in the request
         if (sortBy != null && asc == null) {
             asc = true;

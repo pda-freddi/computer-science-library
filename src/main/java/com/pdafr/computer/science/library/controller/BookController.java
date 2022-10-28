@@ -33,6 +33,7 @@ public class BookController {
 	 * @param sortBy optional query parameter to specify an attribute to sort the list for
 	 * @param asc optional query boolean parameter to specify if sorting order is ascending; defaults to true if not specified
 	 * @return a list of books
+	 * @throws InvalidQueryParameterException
 	 */
 	@GetMapping()
 	public Iterable<Book> getAllBooks(@RequestParam(name="sortby", required=false) String sortBy, @RequestParam(required=false) Boolean asc) {
@@ -82,7 +83,7 @@ public class BookController {
 	 * @throws EntityNotFoundException if no book matches the ID provided 
 	 */
 	@GetMapping("/{id}")
-	public Book getBookById(@PathVariable("id") int id) {
+	public Book getBookById(@PathVariable("id") Integer id) {
 		Optional<Book> bookOptional = this.bookRepository.findById(id);
 		if (!bookOptional.isPresent()) {
 			throw new EntityNotFoundException("Can't find a book with ID " + id);
@@ -113,13 +114,12 @@ public class BookController {
 	 * @throws EntityNotFoundException if no book matches the ID provided
 	 */
 	@PutMapping("/{id}")
-	public Book updateBook(@PathVariable("id") int id, @RequestBody Book book) {
+	public Book updateBook(@PathVariable("id") Integer id, @RequestBody Book book) {
 	    Optional<Book> bookToUpdateOptional = this.bookRepository.findById(id);
 	    if (!bookToUpdateOptional.isPresent()) {
 	        throw new EntityNotFoundException("Can't find a book with ID " + id);
 	    }
 	    Book bookToUpdate = bookToUpdateOptional.get();
-	    // TO DO: ADD BOOK OBJECT VALIDATION BEFORE SAVING TO DATABASE
 	    if (book.getTitle() != null) {
 	        bookToUpdate.setTitle(book.getTitle());
 	    }
@@ -143,7 +143,7 @@ public class BookController {
 	 * @throws EntityNotFoundException if no book matches the ID provided
 	 */
 	@DeleteMapping("/{id}")
-	public String deleteBook(@PathVariable("id") int id) {
+	public String deleteBook(@PathVariable("id") Integer id) {
 	    Optional<Book> bookToDeleteOptional = this.bookRepository.findById(id);
 	    if (!bookToDeleteOptional.isPresent()) {
 	        throw new EntityNotFoundException("Can't find a book with ID " + id);

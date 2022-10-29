@@ -40,7 +40,7 @@ public class ArticleController {
     @GetMapping()
     public Iterable<Article> getAllArticles(@RequestParam(name="sort_by", required=false) String sortBy, @RequestParam(required=false) Boolean asc) {
         // Initialize asc variable to a default value if it's not specified in the request
-        if (sortBy != null && asc == null) {
+        if (asc == null) {
             asc = true;
         }
         // If sort request parameter is specified, return a sorted list of books according to the parameter
@@ -74,8 +74,12 @@ public class ArticleController {
                 throw new InvalidQueryParameterException(sortBy + " is not a valid query parameter");
             }
         }
-        // If sort by parameter is not specified, return list of books ordered by ID
-        return this.articleRepository.findAllByOrderByIdAsc();
+        // If sort by parameter is not specified, return list of articles ordered by ID in asc or desc order
+        if (asc) {
+            return this.articleRepository.findAllByOrderByIdAsc();
+        } else {
+            return this.articleRepository.findAllByOrderByIdDesc();
+        }
     }
     
     /**

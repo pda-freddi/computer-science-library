@@ -11,6 +11,7 @@ public interface BookRepository extends CrudRepository<Book, Integer> {
 
     // Find all books ordered by different columns and asc/desc order
     List<Book> findAllByOrderByIdAsc();
+    List<Book> findAllByOrderByIdDesc();
     List<Book> findAllByOrderByTitleAsc();
     List<Book> findAllByOrderByTitleDesc();
     List<Book> findAllByOrderByAuthorAsc();

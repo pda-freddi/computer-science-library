@@ -40,7 +40,7 @@ public class VideoController {
     @GetMapping()
     public Iterable<Video> getAllVideos(@RequestParam(name="sort_by", required=false) String sortBy, @RequestParam(required=false) Boolean asc) {
         // Initialize asc variable to a default value if it's not specified in the request
-        if (sortBy != null && asc == null) {
+        if (asc == null) {
             asc = true;
         }
         // If sort request parameter is specified, return a sorted list of videos according to the parameter
@@ -74,8 +74,12 @@ public class VideoController {
                 throw new InvalidQueryParameterException(sortBy + " is not a valid query parameter");
             }
         }
-        // If sort by parameter is not specified, return list of videos ordered by ID
-        return this.videoRepository.findAllByOrderByIdAsc();
+        // If sort by parameter is not specified, return list of videos ordered by ID in asc or desc order
+        if (asc) {    
+            return this.videoRepository.findAllByOrderByIdAsc();
+        } else {
+            return this.videoRepository.findAllByOrderByIdDesc();
+        }
     }
     
     /**

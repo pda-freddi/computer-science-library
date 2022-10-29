@@ -9,6 +9,7 @@ import com.pdafr.computer.science.library.model.Video;
 public interface VideoRepository extends CrudRepository<Video, Integer> {
 
     List<Video> findAllByOrderByIdAsc();
+    List<Video> findAllByOrderByIdDesc();
     List<Video> findAllByOrderByTitleAsc();
     List<Video> findAllByOrderByTitleDesc();
     List<Video> findAllByOrderByChannelAsc();

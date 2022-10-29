@@ -11,6 +11,7 @@ public interface ArticleRepository extends CrudRepository<Article, Integer> {
 
     // Find all articles ordered by different columns and asc/desc order
     List<Article> findAllByOrderByIdAsc();
+    List<Article> findAllByOrderByIdDesc();
     List<Article> findAllByOrderByTitleAsc();
     List<Article> findAllByOrderByTitleDesc();
     List<Article> findAllByOrderByAuthorAsc();

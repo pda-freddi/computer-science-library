@@ -128,6 +128,10 @@ public class SearchController {
             
             return this.articleRepository.findByTitleContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndCategoryAndReadTimeLessThanEqual(title, author, categoryEnum, maxReadTime);
           
+        } else if (hasTitle && hasAuthor && hasCategory && !hasMaxReadTime) {
+          
+            return this.articleRepository.findByTitleContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndCategory(title, author, categoryEnum);
+      
         } else if (hasTitle && hasAuthor && !hasCategory && hasMaxReadTime) {
           
             return this.articleRepository.findByTitleContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndReadTimeLessThanEqual(title, author, maxReadTime);

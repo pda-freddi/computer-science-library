@@ -16,7 +16,44 @@ The application exposes a REST API to interact with the datasource, which consis
 
 ## How To Use
 
-To be defined.
+To run this application you'll need to install [Java Development Kit (JDK)](https://www.oracle.com/br/java/technologies/downloads/) version 17 or later, if you don't have it installed already. With that requirement fulfilled, open a terminal and run the following commands to clone this repository and navigate to the application's root directory:
+
+```
+git clone https://github.com/Pedro-Freddi/computer-science-library.git
+cd computer-science-library
+```
+
+Then use the following command to build and run this Spring Boot application with Maven if you're on Linux or macOS:
+
+```
+./mvnw spring-boot:run
+```
+
+Or this one if you're on Windows:
+
+```
+mvnw spring-boot:run
+```
+
+The application should now be available at ``localhost:4001/``. Refer to the [Endpoints](#endpoints) or [Usage Examples with the cURL tool](#usage-examples-with-the-curl-tool) sections to find out how to interact with it.
+
+> :warning: By default, the database is initialized with data contained in the [data.sql](./src/main/resources/data.sql) file and changes made to the dataset (record creation, updates, deletion, etc.) will be discarded after the application is terminated, which guarantees that the database will always reflect the data.sql file. To change this behavior and persist the changes, locate the following properties in the [application.properties](./src/main/resources/application.properties) file and replace their values with the ones provided below.
+
+```
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.defer-datasource-initialization=false
+spring.sql.init.mode=never
+```
+
+You can access H2 database's console at ``localhost:4001/h2-console``. Use the following to log in:
+
+```
+JDBC url: jdbc:h2:file:~/data/library
+Username: dbadmin
+Password: dbadmin
+```
+
+The username, password and location where database files are stored can be changed in the [application.properties](./src/main/resources/application.properties) file.
 
 ## Endpoints
 
@@ -171,5 +208,3 @@ Video with ID 15 deleted successfully
 ## Future Improvements
 
 * Build a user interface to facilitate the visualization and management of the dataset.
-* Improve the robustness of input validation for requests that require sending query/path parameters or data in the request body.
-* Implement an authentication mechanism to protect endpoints that accept POST, PUT and DELETE requests.

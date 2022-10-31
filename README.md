@@ -14,7 +14,7 @@ The application exposes a REST API to interact with the datasource, which consis
 * [Hibernate ORM](https://hibernate.org/)
 * [Maven](https://maven.apache.org/)
 
-## How To Use Locally
+## How To Run Locally
 
 To run this application you'll need to install [Java Development Kit (JDK)](https://www.oracle.com/br/java/technologies/downloads/) version 17 or later, if you don't have it installed already. With that requirement fulfilled, open a terminal and run the following commands to clone this repository and navigate to the application's root directory:
 
@@ -149,7 +149,7 @@ Multiple query parameters can be used in any combination to refine the search re
 | /search/videos | title, channel, category, max_length |
 
 Observations: 
-* `read_time` and `length` are specified in minutes.
+* `max_read_time` and `max_length` are specified in minutes.
 * `category` must match one of the values specified in [Category.java](./src/main/java/com/pdafr/computer/science/library/enums/Category.java).
 * Title, author and category are treated as case insensitive to perform the search.
 

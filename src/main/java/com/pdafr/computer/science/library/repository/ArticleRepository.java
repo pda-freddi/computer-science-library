@@ -24,7 +24,7 @@ public interface ArticleRepository extends CrudRepository<Article, Integer> {
     // Find a list of articles by matching with columns
     // One colum
     List<Article> findByTitleContainingIgnoreCase(String title);
-    List<Article> findByAuthorContainingIgnoreCase(String title);
+    List<Article> findByAuthorContainingIgnoreCase(String author);
     List<Article> findByCategory(Category category);
     List<Article> findByReadTimeLessThanEqual(Integer readTime);
     

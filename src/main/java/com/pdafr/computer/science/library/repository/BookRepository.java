@@ -24,7 +24,7 @@ public interface BookRepository extends CrudRepository<Book, Integer> {
     // Find a list of books by matching with columns
     // One colum
     List<Book> findByTitleContainingIgnoreCase(String title);
-    List<Book> findByAuthorContainingIgnoreCase(String title);
+    List<Book> findByAuthorContainingIgnoreCase(String author);
     List<Book> findByCategory(Category category);
     
     // Two columns

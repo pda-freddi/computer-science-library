@@ -9,6 +9,7 @@ import com.pdafr.computer.science.library.enums.Category;
 import com.pdafr.computer.science.library.exceptions.InvalidCategoryException;
 import com.pdafr.computer.science.library.model.Article;
 import com.pdafr.computer.science.library.model.Book;
+import com.pdafr.computer.science.library.model.Video;
 import com.pdafr.computer.science.library.repository.ArticleRepository;
 import com.pdafr.computer.science.library.repository.BookRepository;
 import com.pdafr.computer.science.library.repository.VideoRepository;
@@ -185,11 +186,110 @@ public class SearchController {
             return this.articleRepository.findByReadTimeLessThanEqual(maxReadTime);
       
         } else {
-          
+
             return this.articleRepository.findAllByOrderByIdAsc();
           
         }
         
     }
-  
+    
+    /**
+     * Search for videos
+     * @param title or term to search for; case insensitive
+     * @param channel whole name or part of name; case insensitive
+     * @param category must match a category enum; case insensitive
+     * @return a list of videos that match the search parameters or all videos if no parameters are specified
+     * @throws InvalidCategoryException
+     */
+    @GetMapping("/videos")
+    public Iterable<Video> searchVideos(
+        @RequestParam(required=false) String title,
+        @RequestParam(required=false) String channel,
+        @RequestParam(required=false) String category,
+        @RequestParam(name="max_length", required=false) Integer maxLength) {
+      
+        // Check which query parameters the request has
+        Boolean hasTitle = title != null && !title.isBlank() && !title.isEmpty();
+        Boolean hasChannel = channel != null && !channel.isBlank() && !channel.isEmpty();
+        Boolean hasCategory = category != null && !category.isBlank() && !category.isEmpty();
+        Boolean hasMaxLength = maxLength != null;
+        
+        // Validate category parameter if present and convert it to enum
+        Category categoryEnum = null;
+        if (category != null) {
+            if (!CategoryValidator.validateFromString(category.toUpperCase())) {
+                throw new InvalidCategoryException("Invalid category parameter");
+            }
+            categoryEnum = Category.valueOf(category.toUpperCase());
+        }
+        
+        // Return list of results according to the parameters provided
+        if (hasTitle && hasChannel && hasCategory && hasMaxLength) {
+            
+            return this.videoRepository.findByTitleContainingIgnoreCaseAndChannelContainingIgnoreCaseAndCategoryAndLengthLessThanEqual(title, channel, categoryEnum, maxLength);
+          
+        } else if (hasTitle && hasChannel && hasCategory && !hasMaxLength) {
+          
+            return this.videoRepository.findByTitleContainingIgnoreCaseAndChannelContainingIgnoreCaseAndCategory(title, channel, categoryEnum);
+      
+        } else if (hasTitle && hasChannel && !hasCategory && hasMaxLength) {
+          
+            return this.videoRepository.findByTitleContainingIgnoreCaseAndChannelContainingIgnoreCaseAndLengthLessThanEqual(title, channel, maxLength);
+        
+        } else if (hasTitle && !hasChannel && hasCategory && hasMaxLength) {
+          
+            return this.videoRepository.findByTitleContainingIgnoreCaseAndCategoryAndLengthLessThanEqual(title, categoryEnum, maxLength);
+        
+        } else if (!hasTitle && hasChannel && hasCategory && hasMaxLength) {
+          
+            return this.videoRepository.findByChannelContainingIgnoreCaseAndCategoryAndLengthLessThanEqual(channel, categoryEnum, maxLength);
+      
+        } else if (hasTitle && hasChannel && !hasCategory && !hasMaxLength) {
+          
+            return this.videoRepository.findByTitleContainingIgnoreCaseAndChannelContainingIgnoreCase(title, channel);
+          
+        } else if (hasTitle && !hasChannel && hasCategory && !hasMaxLength) {
+          
+            return this.videoRepository.findByTitleContainingIgnoreCaseAndCategory(title, categoryEnum);
+          
+        } else if (!hasTitle && hasChannel && hasCategory && !hasMaxLength) {
+          
+            return this.videoRepository.findByChannelContainingIgnoreCaseAndCategory(channel, categoryEnum);
+          
+        } else if (hasTitle && !hasChannel && !hasCategory && hasMaxLength) {
+          
+            return this.videoRepository.findByTitleContainingIgnoreCaseAndLengthLessThanEqual(title, maxLength);
+        
+        } else if (!hasTitle && hasChannel && !hasCategory && hasMaxLength) {
+          
+            return this.videoRepository.findByChannelContainingIgnoreCaseAndLengthLessThanEqual(channel, maxLength);
+        
+        } else if (!hasTitle && !hasChannel && hasCategory && hasMaxLength) {
+          
+            return this.videoRepository.findByCategoryAndLengthLessThanEqual(categoryEnum, maxLength);
+      
+        } else if (hasTitle && !hasChannel && !hasCategory && !hasMaxLength) {
+          
+            return this.videoRepository.findByTitleContainingIgnoreCase(title);
+          
+        } else if (!hasTitle && hasChannel && !hasCategory && !hasMaxLength) {
+          
+            return this.videoRepository.findByChannelContainingIgnoreCase(channel);
+        
+        } else if (!hasTitle && !hasChannel && hasCategory && !hasMaxLength) {
+          
+            return this.videoRepository.findByCategory(categoryEnum);
+        
+        } else if (!hasTitle && !hasChannel && !hasCategory && hasMaxLength) {
+          
+            return this.videoRepository.findByLengthLessThanEqual(maxLength);
+      
+        } else {
+
+            return this.videoRepository.findAllByOrderByIdAsc();
+          
+        }
+        
+    }
+    
 }

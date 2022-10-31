@@ -14,7 +14,7 @@ The application exposes a REST API to interact with the datasource, which consis
 * [Hibernate ORM](https://hibernate.org/)
 * [Maven](https://maven.apache.org/)
 
-## How To Use
+## How To Use Locally
 
 To run this application you'll need to install [Java Development Kit (JDK)](https://www.oracle.com/br/java/technologies/downloads/) version 17 or later, if you don't have it installed already. With that requirement fulfilled, open a terminal and run the following commands to clone this repository and navigate to the application's root directory:
 
@@ -208,3 +208,6 @@ Video with ID 15 deleted successfully
 ## Future Improvements
 
 * Build a user interface to facilitate the visualization and management of the dataset.
+* Improve the robustness of input validation and error handling on endpoints.
+* Implement an authentication mechanism to secure the endpoints that create/modify records.
+* Deploy the application.

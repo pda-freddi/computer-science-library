@@ -14,59 +14,111 @@ The application exposes a REST API to interact with the datasource, which consis
 * [Hibernate ORM](https://hibernate.org/)
 * [Maven](https://maven.apache.org/)
 
+## How To Use
+
+To be defined.
+
 ## Endpoints
 
 This section briefly documents the available endpoints.
 
+### Record Retrieval
+
 ```
-/books
-/articles
-/videos
+GET /books
+GET /books/{id}
+GET /articles
+GET /articles/{id}
+GET /videos
+GET /videos{id}
 ```
 
-These endpoints accept GET and POST requests to retrieve all records and create new records, respectively.
+These endpoints accept GET requests to retrieve all books, articles and videos or to retrieve a specific record by specifying an ID parameter in the URI.
 
-GET requests can use `sort_by` and `asc` query parameters to specify how the results should be ordered:
-* `sort_by` accepts one of these values: `title`, `author`, `category`, `numPages` (for books), `readTime` (for articles) or `length` (for videos).  
+The requests for all records of a type can use `sort_by` and/or `asc` query parameters to specify how the list of results should be ordered:
+* `sort_by` accepts one of these values: `title`, `author`, `category`, `numPages` (only for books), `readTime` (only for articles) or `length` (only for videos).  
 * `asc` accepts the values true, for ascending order, and false for descending order.
 
-If no query parameters are specified in the request, results will be ordered by ID in ascending order.  
+If no query parameters are specified in the request, results will be ordered by ID in ascending order.
 
-POST requests must send the record object in the request body.
-
-```
-/books/{id}
-/articles/{id}
-/videos/{id}
-```
-
-Accept PUT and DELETE requests to update and delete, respectively, the record specified by the ID path parameter.
+### Create New Records
 
 ```
-/search
-/search/books
-/search/articles
-/search/videos
+POST /books
+POST /articles
+POST /videos
 ```
 
-Search endpoints accept only GET requests.  
+The request's body must contain the data for record creation. All fields must be present, except for the record ID, which is generated automatically. To create a new book record, for example, the request's body should be:
 
-Multiple query parameters can be specified in any combination to refine the search results:
+```
+{
+    "title": "Book title",
+    "author": "Book author",
+    "category": "Book category",
+    "numPages": 500
+}
+```
+  
+On successful record creation, the corresponding object will be sent back in the response's body.
+
+### Update Records
+
+```
+PUT /books/{id}
+PUT /articles/{id}
+PUT /videos/{id}
+```
+
+Requests to update a record must specify the record's ID in the URI and send the fields to be updated in the request's body. To update the title and link fields of the video record with an ID of 15, for example, a PUT request should be made to the `/videos/15` endpoint and its body should be:
+
+```
+{
+    "title": "New title",
+    "link": "https://example/path-to-video"
+}
+```
+
+The updated record is returned in the response's body.
+
+### Delete Records
+
+```
+DELETE /books/{id}
+DELETE /articles/{id}
+DELETE /videos/{id}
+```
+
+A record can be deleted by making a DELETE request specifying the record's type and ID in the URI. To delete the book with ID of 14, for example, a DELETE request should be made to the `/books/15` endpoint.
+
+A message will be sent in the response's body to confirm that the record was deleted.
+
+### Search Records
+
+```
+GET /search/books
+GET /search/articles
+GET /search/videos
+```
+
+Search endpoints query the records of the corresponding type specified in the URI. 
+
+Multiple query parameters can be used in any combination to refine the search results. The following table relates each endpoint and the parameters it accept.
 
 | Endpoint | Query Parameters |
 | :-----------: | :-----------: |
-| /search | category, title |
 | /search/books | title, author, category |
 | /search/articles | title, author, category, max_read_time |
-| /search/videos | title, author, category, max_length |
+| /search/videos | title, channel, category, max_length |
 
 Observations: 
 * `read_time` and `length` are specified in minutes.
 * `category` must match one of the values specified in [Category.java](./src/main/java/com/pdafr/computer/science/library/enums/Category.java).
 * Title, author and category are treated as case insensitive to perform the search.
 
-## Examples
+## Usage Examples with the cURL tool
 
+Retrieve the book with an ID of 4.
 ```
 curl localhost:4001/books/4
 
@@ -77,7 +129,10 @@ curl localhost:4001/books/4
     "category": "PROGRAMMING_LANGUAGES",
     "numPages": 436
 }
+```
 
+Search for articles containing "javascript" in the title, written by "Tania", belonging to the "API" categorys and with a max read time of 20 minutes.
+```
 curl localhost:4001/search/articles?title=javascript&author=tania&category=api&max_read_time=20
 
 [
@@ -90,7 +145,10 @@ curl localhost:4001/search/articles?title=javascript&author=tania&category=api&m
         "link": "https://www.taniarascia.com/how-to-connect-to-an-api-with-javascript/"
     }
 ]
+```
 
+Create a new video record.
+```
 curl -X POST -d "{ \"title\": \"Ryan Dahl: Original Node.js presentation\", \"channel\": \"stri8ted\", \"category\": \"PROGRAMMING_LANGUAGES\", \"length\": 49, \"link\": \"https://www.youtube.com/watch?v=ztspvPYybIY\" }" -H "Content-Type: application/json" localhost:4001/videos
 
 {
@@ -101,13 +159,17 @@ curl -X POST -d "{ \"title\": \"Ryan Dahl: Original Node.js presentation\", \"ch
     "length": 49,
     "link": "https://www.youtube.com/watch?v=ztspvPYybIY"
 }
+```
 
+Delete the video record with an ID of 15.
+```
 curl -X DELETE localhost:4001/videos/15
 
 Video with ID 15 deleted successfully
-
 ```
 
 ## Future Improvements
 
-* Build a front-end to facilitate the visualization and management of the dataset.
+* Build a user interface to facilitate the visualization and management of the dataset.
+* Improve the robustness of input validation for requests that require sending query/path parameters or data in the request body.
+* Implement an authentication mechanism to protect endpoints that accept POST, PUT and DELETE requests.

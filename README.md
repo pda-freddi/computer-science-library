@@ -2,7 +2,7 @@
 
 Computer Science Library is a web application that stores and manages records of books, articles and videos related to CS topics.
 
-The motivation behind the project is that while I was looking for an idea to practice designing web applications with Java and Spring, I realized that my browser's bookmarks bar is filled with links to articles, books and videos related to computer science and software development. So I thought it'd be nice to have an application to store and retrieve those links efficiently and that's how Computer Science Library was born.
+The motivation behind the project is that while I was looking for an idea to practice designing web applications with Java and Spring, I realized that my browser's bookmarks bar is filled with links to interesting and useful articles, books and videos related to computer science and software development. So I thought it'd be nice to have an application to store and retrieve those links efficiently and that's how Computer Science Library was born.
 
 The application exposes a REST API to interact with the datasource, which consists of an embedded H2 database configured to save records in a local file.
 
@@ -72,7 +72,7 @@ GET /videos{id}
 
 These endpoints accept GET requests to retrieve all books, articles and videos or to retrieve a specific record by specifying an ID parameter in the URI.
 
-The requests for all records of a type can use `sort_by` and/or `asc` query parameters to specify how the list of results should be ordered:
+The requests to retrieve all records of a given type can use `sort_by` and/or `asc` query parameters to specify how the list of results should be ordered:
 * `sort_by` accepts one of these values: `title`, `author`, `category`, `numPages` (only for books), `readTime` (only for articles) or `length` (only for videos).  
 * `asc` accepts the values true, for ascending order, and false for descending order.
 
@@ -86,7 +86,7 @@ POST /articles
 POST /videos
 ```
 
-The request's body must contain the data for record creation. All fields must be present, except for the record ID, which is generated automatically. To create a new book record, for example, the request's body should be:
+The request's body must contain the data for record creation. All fields must be present, except for the record ID, which is generated automatically. To create a new book record, for example, a POST request should be made to `/books` and its body should contain:
 
 ```
 {
@@ -97,7 +97,7 @@ The request's body must contain the data for record creation. All fields must be
 }
 ```
   
-On successful record creation, the corresponding object will be sent back in the response's body.
+On successful record creation, the new object will be sent back in the response's body.
 
 ### Update Records
 
@@ -109,7 +109,7 @@ PUT /videos/{id}
 
 Requests to update a record must specify the record's ID in the URI and send the updated entity (containing all fields, except ID) in the request's body. To update only specific fields, [check out the PATCH method](#patch-records). 
 
-To update the article with an ID of 8, for example, a PUT request should be made to the `/articles/8` endpoint and its body should be:
+To update the article with an ID of 8, for example, a PUT request should be made to `/articles/8` and its body should contain:
 
 ```
 {
@@ -131,9 +131,9 @@ PATCH /articles/{id}
 PATCH /videos/{id}
 ```
 
-The PATCH method allows the user to update (patch) one or more fields of the record specified in the ID parameter of the URI. The difference between the PATCH and PUT methods is that the former is not guaranteed to be idempotent and doesn't require all fields of an entity to be sent in the request's body. 
+The PATCH method allows the user to update (patch) one or more fields of the record specified by the ID parameter in the URI. The difference between the PATCH and PUT methods is that the former is not guaranteed to be idempotent and doesn't require all fields of an entity to be sent in the request's body. 
 
-To update only the title and link fields of the video record with an ID of 15, for example, a PATCH request can be made to the `/videos/15` endpoint containing in the body:
+To update only the title and link fields of the video record with an ID of 15, for example, a PATCH request should be made to `/videos/15`  and its body should contain:
 
 ```
 {
@@ -155,7 +155,7 @@ DELETE /videos/{id}
 
 A record can be deleted by making a DELETE request specifying the record's type and ID in the URI. To delete the book with ID of 14, for example, a DELETE request should be made to the `/books/15` endpoint.
 
-A message will be sent in the response's body to confirm that the record was deleted.
+A message confirming that the record was deleted is sent back in the response's body.
 
 ### Search Records
 

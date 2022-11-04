@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,6 +20,7 @@ import com.pdafr.computer.science.library.exceptions.InvalidInputObjectException
 import com.pdafr.computer.science.library.exceptions.InvalidQueryParameterException;
 import com.pdafr.computer.science.library.model.Article;
 import com.pdafr.computer.science.library.repository.ArticleRepository;
+import com.pdafr.computer.science.library.validator.ArticleValidator;
 
 @RestController
 @RequestMapping("/articles")
@@ -38,6 +40,7 @@ public class ArticleController {
      * @throws InvalidQueryParameterException
      */
     @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
     public Iterable<Article> getAllArticles(@RequestParam(name="sort_by", required=false) String sortBy, @RequestParam(required=false) Boolean asc) {
         // Initialize asc variable to a default value if it's not specified in the request
         if (asc == null) {
@@ -89,6 +92,7 @@ public class ArticleController {
      * @throws EntityNotFoundException if no article matches the ID provided 
      */
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public Article getArticleById(@PathVariable("id") Integer id) {
         Optional<Article> articleOptional = this.articleRepository.findById(id);
         if (!articleOptional.isPresent()) {
@@ -107,7 +111,7 @@ public class ArticleController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public Article saveNewArticle(@RequestBody Article article) {
-        if (article.getTitle() == null || article.getAuthor() == null || article.getCategory() == null || article.getReadTime() == null || article.getLink() == null) {
+        if (!ArticleValidator.validateArticle(article)) {
             throw new InvalidInputObjectException("Input article object missing field(s)");
         }
         Article newArticle = this.articleRepository.save(article);
@@ -120,31 +124,60 @@ public class ArticleController {
      * @param article object with updated fields
      * @return updated article object
      * @throws EntityNotFoundException if no article matches the ID provided
+     * @throws InvalidInputObjectException if input article object is missing fields
      */
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public Article updateArticle(@PathVariable("id") Integer id, @RequestBody Article article) {
         Optional<Article> articleToUpdateOptional = this.articleRepository.findById(id);
         if (!articleToUpdateOptional.isPresent()) {
             throw new EntityNotFoundException("Can't find an article with ID " + id);
         }
+        if (!ArticleValidator.validateArticle(article)) {
+          throw new InvalidInputObjectException("Input article object missing field(s)");
+        }
         Article articleToUpdate = articleToUpdateOptional.get();
-        if (article.getTitle() != null) {
-            articleToUpdate.setTitle(article.getTitle());
-        }
-        if (article.getAuthor() != null) {
-            articleToUpdate.setAuthor(article.getAuthor());
-        }
-        if (article.getCategory() != null) {
-            articleToUpdate.setCategory(article.getCategory());
-        }
-        if (article.getReadTime() != null) {
-            articleToUpdate.setReadTime(article.getReadTime());
-        }
-        if (article.getLink() != null) {
-            articleToUpdate.setLink(article.getLink());
-        }
+        articleToUpdate.setTitle(article.getTitle());
+        articleToUpdate.setAuthor(article.getAuthor());
+        articleToUpdate.setCategory(article.getCategory());
+        articleToUpdate.setReadTime(article.getReadTime());
+        articleToUpdate.setLink(article.getLink());
         Article updatedArticle = this.articleRepository.save(articleToUpdate);
         return updatedArticle;
+    }
+    
+    /**
+     * Patch an article object
+     * @param id of article to be patched
+     * @param article object with patched field(s)
+     * @return patched article object
+     * @throws EntityNotFoundException if no article matches the ID provided
+     */
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Article patchArticle(@PathVariable("id") Integer id, @RequestBody Article article) {
+        Optional<Article> articleToPatchOptional = this.articleRepository.findById(id);
+        if (!articleToPatchOptional.isPresent()) {
+            throw new EntityNotFoundException("Can't find an article with ID " + id);
+        }
+        Article articleToPatch = articleToPatchOptional.get();
+        if (ArticleValidator.validateTitle(article.getTitle())) {
+            articleToPatch.setTitle(article.getTitle());
+        }
+        if (ArticleValidator.validateAuthor(article.getAuthor())) {
+            articleToPatch.setAuthor(article.getAuthor());
+        }
+        if (article.getCategory() != null) {
+            articleToPatch.setCategory(article.getCategory());
+        }
+        if (ArticleValidator.validateReadTime(article.getReadTime())) {
+            articleToPatch.setReadTime(article.getReadTime());
+        }
+        if (ArticleValidator.validateLink(article.getLink())) {
+            articleToPatch.setLink(article.getLink());
+        }
+        Article patchedArticle = this.articleRepository.save(articleToPatch);
+        return patchedArticle;
     }
     
     /**
@@ -154,6 +187,7 @@ public class ArticleController {
      * @throws EntityNotFoundException if no article matches the ID provided
      */
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public String deleteArticle(@PathVariable("id") Integer id) {
         Optional<Article> articleToDeleteOptional = this.articleRepository.findById(id);
         if (!articleToDeleteOptional.isPresent()) {

@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,6 +20,7 @@ import com.pdafr.computer.science.library.exceptions.InvalidInputObjectException
 import com.pdafr.computer.science.library.exceptions.InvalidQueryParameterException;
 import com.pdafr.computer.science.library.model.Book;
 import com.pdafr.computer.science.library.repository.BookRepository;
+import com.pdafr.computer.science.library.validator.BookValidator;
 
 @RestController
 @RequestMapping("/books")
@@ -38,6 +40,7 @@ public class BookController {
 	 * @throws InvalidQueryParameterException
 	 */
 	@GetMapping()
+	@ResponseStatus(HttpStatus.OK)
 	public Iterable<Book> getAllBooks(@RequestParam(name="sort_by", required=false) String sortBy, @RequestParam(required=false) Boolean asc) {
 	    // Initialize asc variable to a default value if it's not specified in the request
 	    if (asc == null) {
@@ -90,6 +93,7 @@ public class BookController {
 	 * @throws EntityNotFoundException if no book matches the ID provided 
 	 */
 	@GetMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public Book getBookById(@PathVariable("id") Integer id) {
 		Optional<Book> bookOptional = this.bookRepository.findById(id);
 		if (!bookOptional.isPresent()) {
@@ -108,7 +112,7 @@ public class BookController {
 	@PostMapping()
 	@ResponseStatus(HttpStatus.CREATED)
 	public Book saveNewBook(@RequestBody Book book) {
-	    if (book.getTitle() == null || book.getAuthor() == null || book.getCategory() == null || book.getNumPages() == null) {
+	    if (!BookValidator.validateBook(book)) {
 	        throw new InvalidInputObjectException("Input book object missing field(s)");
 	    }
 		Book newBook = this.bookRepository.save(book);
@@ -121,29 +125,57 @@ public class BookController {
 	 * @param book object with updated fields
 	 * @return updated book object
 	 * @throws EntityNotFoundException if no book matches the ID provided
+	 * @throws InvalidInputObjectException if input book object is missing fields
 	 */
 	@PutMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public Book updateBook(@PathVariable("id") Integer id, @RequestBody Book book) {
 	    Optional<Book> bookToUpdateOptional = this.bookRepository.findById(id);
 	    if (!bookToUpdateOptional.isPresent()) {
 	        throw new EntityNotFoundException("Can't find a book with ID " + id);
 	    }
-	    Book bookToUpdate = bookToUpdateOptional.get();
-	    if (book.getTitle() != null) {
-	        bookToUpdate.setTitle(book.getTitle());
+	    if (!BookValidator.validateBook(book)) {
+	        throw new InvalidInputObjectException("Input book object missing field(s)");
 	    }
-        if (book.getAuthor() != null) {
-            bookToUpdate.setAuthor(book.getAuthor());
-        }
-        if (book.getCategory() != null) {
-            bookToUpdate.setCategory(book.getCategory());
-        }
-        if (book.getNumPages() != null) {
-            bookToUpdate.setNumPages(book.getNumPages());
-        }
+	    Book bookToUpdate = bookToUpdateOptional.get();
+	    bookToUpdate.setTitle(book.getTitle());
+        bookToUpdate.setAuthor(book.getAuthor());
+        bookToUpdate.setCategory(book.getCategory());
+        bookToUpdate.setNumPages(book.getNumPages());
         Book updatedBook = this.bookRepository.save(bookToUpdate);
 	    return updatedBook;
 	}
+	
+	/**
+     * Patch a book object
+     * @param id of book to be patched
+     * @param book object with patched field(s)
+     * @return patched book object
+     * @throws EntityNotFoundException if no book matches the ID provided
+     */
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Book patchBook(@PathVariable("id") Integer id, @RequestBody Book book) {
+        Optional<Book> bookToPatchOptional = this.bookRepository.findById(id);
+        if (!bookToPatchOptional.isPresent()) {
+            throw new EntityNotFoundException("Can't find a book with ID " + id);
+        }
+        Book bookToPatch = bookToPatchOptional.get();
+        if (BookValidator.validateTitle(book.getTitle())) {
+            bookToPatch.setTitle(book.getTitle());
+        }
+        if (BookValidator.validateAuthor(book.getAuthor())) {
+            bookToPatch.setAuthor(book.getAuthor());
+        }
+        if (book.getCategory() != null) {
+            bookToPatch.setCategory(book.getCategory());
+        }
+        if (BookValidator.validateNumPages(book.getNumPages())) {
+            bookToPatch.setNumPages(book.getNumPages());
+        }
+        Book patchedBook = this.bookRepository.save(bookToPatch);
+        return patchedBook;
+    }
 	
 	/**
 	 * Delete a book object
@@ -152,6 +184,7 @@ public class BookController {
 	 * @throws EntityNotFoundException if no book matches the ID provided
 	 */
 	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public String deleteBook(@PathVariable("id") Integer id) {
 	    Optional<Book> bookToDeleteOptional = this.bookRepository.findById(id);
 	    if (!bookToDeleteOptional.isPresent()) {

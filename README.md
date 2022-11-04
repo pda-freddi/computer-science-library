@@ -107,7 +107,33 @@ PUT /articles/{id}
 PUT /videos/{id}
 ```
 
-Requests to update a record must specify the record's ID in the URI and send the fields to be updated in the request's body. To update the title and link fields of the video record with an ID of 15, for example, a PUT request should be made to the `/videos/15` endpoint and its body should be:
+Requests to update a record must specify the record's ID in the URI and send the updated entity (containing all fields, except ID) in the request's body. To update only specific fields, [check out the PATCH method](#patch-records). 
+
+To update the article with an ID of 8, for example, a PUT request should be made to the `/articles/8` endpoint and its body should be:
+
+```
+{
+    "title": "Updated title",
+    "author": "Updated author",
+    "category": "Article category",
+    "readTime": 30
+    "link": "https://example/path-to-article"
+}
+```
+
+The updated record is returned in the response's body.
+
+### Patch Records
+
+```
+PATCH /books/{id}
+PATCH /articles/{id}
+PATCH /videos/{id}
+```
+
+The PATCH method allows the user to update (patch) one or more fields of the record specified in the ID parameter of the URI. The difference between the PATCH and PUT methods is that the former is not guaranteed to be idempotent and doesn't require all fields of an entity to be sent in the request's body. 
+
+To update only the title and link fields of the video record with an ID of 15, for example, a PATCH request can be made to the `/videos/15` endpoint containing in the body:
 
 ```
 {
@@ -116,7 +142,8 @@ Requests to update a record must specify the record's ID in the URI and send the
 }
 ```
 
-The updated record is returned in the response's body.
+The updated (patched) record is returned in the response's body.
+
 
 ### Delete Records
 

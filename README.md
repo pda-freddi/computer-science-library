@@ -4,7 +4,7 @@ Computer Science Library is a web application that stores and manages records of
 
 The motivation behind the project is that while I was looking for an idea to practice designing web applications with Java and Spring, I realized that my browser's bookmarks bar is filled with links to interesting and useful articles, books and videos related to computer science and software development. So I thought it'd be nice to have an application to store and retrieve those links efficiently and that's how Computer Science Library was born.
 
-The application exposes a REST API to interact with the datasource, which consists of an embedded H2 database configured to save records in a local file.
+The application exposes a RESTful API to interact with the datasource, which consists of an embedded H2 database configured to save records in a local file.
 
 ## Technologies
 
